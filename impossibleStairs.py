@@ -40,10 +40,25 @@ def create_cube(p_cube_height, p_coord_dict):
 
     return (p_cube_height + 0.25)
 
-clear_scene()
-generate_stairs()
+def set_perspective_camera():
+    # Camera settings: retrieved by manually creating a camera and looking at the attribute values
+    camera_translation = [15.153791664496037, 32.66329062323789, -17.244592819031862]
+    camera_rotation = [136.36122876136037, 50.13971297600645, 179.99999999999983]
+    focal_length = 35.0
+
+    new_camera = mc.camera()[0]
+    mc.xform(new_camera, ws = True, t = camera_translation)
+    mc.xform(new_camera, ws = True, ro = camera_rotation)
+    mc.setAttr(new_camera + ".focalLength", focal_length)
+
+    mc.lookThru(new_camera)
+
+def main():
+    clear_scene()
+    generate_stairs()
+    set_perspective_camera()
+
+main()
 
 # TODO: polyExtrude front face of first cube
 # TODO: add light source
-
-# TODO: add perspective camera
