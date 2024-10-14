@@ -9,9 +9,15 @@ def clear_scene():
 def generate_stairs():
     num_steps = 0
     cube_height = 20
-    coord_dict = {'x': -6, 'z': 6}
+    coord_dict = {'x': -6, 'z': 4} # Values arbitrarily decided after manual testing
 
-    cube_height = generate_flight_of_stairs(coord_dict, 0,                  -CUBE_HEIGHT_WIDTH, cube_height, 7)
+    # Generate the first step and extrude its front face
+    cube_height, first_cube = create_cube(cube_height, coord_dict)
+
+    # Polyextrude the front face of the first cube
+    mc.polyExtrudeFacet(first_cube + ".f[0]", ltz=0.5)  # 0.5 determined after manual testing
+
+    cube_height = generate_flight_of_stairs(coord_dict, 0,                  -CUBE_HEIGHT_WIDTH, cube_height, 6)
     cube_height = generate_flight_of_stairs(coord_dict, CUBE_HEIGHT_WIDTH,  0,                  cube_height, 5)
     cube_height = generate_flight_of_stairs(coord_dict, 0,                  CUBE_HEIGHT_WIDTH,  cube_height, 4)
     cube_height = generate_flight_of_stairs(coord_dict, -CUBE_HEIGHT_WIDTH, 0,                  cube_height, 2)
@@ -21,7 +27,7 @@ def generate_flight_of_stairs(p_coord_dict, p_x_delta, p_z_delta, p_cube_height,
     while num_steps < p_num_steps_in_flight:
         p_coord_dict['x'] += p_x_delta
         p_coord_dict['z'] += p_z_delta
-        p_cube_height = create_cube(p_cube_height, p_coord_dict)
+        p_cube_height = create_cube(p_cube_height, p_coord_dict)[0]
         num_steps += 1
 
     return p_cube_height
@@ -38,7 +44,7 @@ def create_cube(p_cube_height, p_coord_dict):
     # Move the cube so its base aligns with Y = 0 and position it along the X-axis
     mc.move(p_coord_dict['x'], -10 + (p_cube_height / 2), p_coord_dict['z'], curr_cube, ws=True)  # y = p_cube_height / 2 keeps the base at Y=0
 
-    return (p_cube_height + 0.25)
+    return ((p_cube_height + 0.25), curr_cube)
 
 def set_perspective_camera():
     # Camera settings: retrieved by manually creating a camera and looking at the attribute values
@@ -60,5 +66,4 @@ def main():
 
 main()
 
-# TODO: polyExtrude front face of first cube
 # TODO: add light source
