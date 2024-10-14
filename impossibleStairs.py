@@ -43,23 +43,41 @@ def create_cube(p_cube_height, p_coord_dict):
     mc.xform(curr_cube, pivots=(0, -p_cube_height / 2, 0), ws=True)
     
     # Move the cube so its base aligns with Y = 0 and position it along the X-axis
-    mc.move(p_coord_dict['x'], -10 + (p_cube_height / 2), p_coord_dict['z'], curr_cube, ws=True)  # y = p_cube_height / 2 keeps the base at Y=0
+    mc.move(p_coord_dict['x'], (p_cube_height / 2), p_coord_dict['z'], curr_cube, ws=True)  # y = (p_cube_height / 2) keeps the base at Y=0
 
     return ((p_cube_height + 0.25), curr_cube)
 
 def set_perspective_camera():
     # Camera settings: retrieved by manually creating a camera and looking at the attribute values
-    camera_translation = [19.84736949836961, 38.312038840075, -21.903529496661506]
-    # camera_translation = [15.153791664496037, 32.66329062323789, -17.244592819031862]
-    camera_rotation = [138.76122876136156, 48.93971297600498, 179.9999999999995]
-    # camera_rotation = [136.36122876136037, 50.13971297600645, 179.99999999999983]
+    camera_name = "perspective_stairs_cam"
+    translate = [18.65003909667751, 46.65651136436399, -20.5378338921984]
+    rotate = [139.96122876136397, 49.33971297600335, 179.99999999999895]
+    film_aperture = [1.4173200000000001, 0.94488]
     focal_length = 35.0
+    resolution = [960, 540]
+    aspect_ratio = 1.7777776718139648
 
-    new_camera = mc.camera()[0]
-    mc.xform(new_camera, ws = True, t = camera_translation)
-    mc.xform(new_camera, ws = True, ro = camera_rotation)
+    new_camera = mc.camera(name=camera_name)[0]
+
+    # Set translation and rotation
+    mc.setAttr(new_camera + ".translate", *translate)
+    mc.setAttr(new_camera + ".rotate", *rotate)
+
+    # Set the film gate (aperture) and focal length
+    mc.setAttr(new_camera + ".horizontalFilmAperture", film_aperture[0])
+    mc.setAttr(new_camera + ".verticalFilmAperture", film_aperture[1])
     mc.setAttr(new_camera + ".focalLength", focal_length)
 
+    # Set render resolution and aspect ratio
+    mc.setAttr("defaultResolution.width", resolution[0])
+    mc.setAttr("defaultResolution.height", resolution[1])
+    mc.setAttr("defaultResolution.deviceAspectRatio", aspect_ratio)
+
+    # Lock translation, rotation, and scale
+    for attr in ["translate", "rotate", "scale"]:
+        mc.setAttr(f"{new_camera}.{attr}", lock=True)
+
+    # Look through the new camera
     mc.lookThru(new_camera)
 
 # TODO: move into separate file
@@ -73,7 +91,7 @@ def create_walls():
                       'rz': 0,
                       'sx': 67,
                       'sy': 67,
-                      'sz': 0.356}
+                      'sz': 0.2}
     create_wall(transform_dict)
 
     # right wall
@@ -93,7 +111,7 @@ def create_wall(p_transform_dict):
     frames_list = create_frames_on_wall()
     frames_grp = mc.group(frames_list, name="frames")
     mc.xform(frames_grp,
-             translation = [p_transform_dict['tx'], p_transform_dict['ty'], p_transform_dict['tz']],
+             translation = [p_transform_dict['tx']+0.1, p_transform_dict['ty']-32, p_transform_dict['tz']-0.4],
              rotation = [p_transform_dict['rx'], p_transform_dict['ry'], p_transform_dict['rz']],
              worldSpace=True)
     # TODP: Ensure that frames are on the right side of each wall
