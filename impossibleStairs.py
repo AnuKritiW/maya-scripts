@@ -168,11 +168,16 @@ def is_overlap(p_x_pos, p_y_pos, p_fr_width, p_fr_height, p_frame_data_list):
 
     return False
 
+def create_floor():
+    floor = mc.polyCube(d = 90, h = 0.2, w = 90)[0]
+    mc.xform(floor, t = [0, -32, 0])
+
 def main():
     clear_scene()
     generate_stairs()
     set_perspective_camera()
     create_walls()
+    create_floor()
 
 main()
 
