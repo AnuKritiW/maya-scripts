@@ -1,0 +1,17 @@
+# Ignore compiled Python files
+*.pyc
+
+# Ignore Maya project files
+*.ma
+*.mb
+
+# Ignore Maya backup files
+*~.ma
+*~.mb
+
+# Ignore Maya render output files
+images/
+
+# Ignore temporary files and directories
+temp/
+tmp/

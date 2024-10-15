@@ -114,7 +114,7 @@ def create_wall(p_transform_dict):
              translation = [p_transform_dict['tx']+0.1, p_transform_dict['ty']-32, p_transform_dict['tz']-0.4],
              rotation = [p_transform_dict['rx'], p_transform_dict['ry'], p_transform_dict['rz']],
              worldSpace=True)
-    # TODP: Ensure that frames are on the right side of each wall
+    # TODO: Ensure that frames are on the right side of each wall
 
 def create_frames_on_wall():
     num_frames = 400
