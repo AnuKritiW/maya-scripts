@@ -15,6 +15,8 @@ def generate_stairs():
     # Generate the first step and extrude its front face
     step_height, first_step = create_step(step_height, coord_dict)
 
+    first_step = mc.rename(first_step, "First_Step")
+
     # Polyextrude the front face of the first step
     mc.polyExtrudeFacet(first_step + ".f[0]", ltz=0.4)  # ltz determined after manual testing
 
