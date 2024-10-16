@@ -85,36 +85,39 @@ def create_walls():
     wall_dimensions = 67
     # left wall
     transform_dict = {'tx': -10.571,
-                      'ty': 0,
+                      'ty': -33,
                       'tz': 42.109,
                       'rx': 0,
-                      'ry': 0,
+                      'ry': 180,
                       'rz': 0,
                       'sx': wall_dimensions,
                       'sy': wall_dimensions,
                       'sz': 0.2}
-    create_wall(transform_dict)
+    left_wall = create_wall(transform_dict)
 
     # right wall
     transform_dict['tx'] = -42.995
     transform_dict['tz'] = 8.603
-    transform_dict['ry'] = -89.478 # Rotate to help with the illusion
-    create_wall(transform_dict)
+    transform_dict['ry'] = 89.478 # Rotate to help with the illusion
+    right_wall = create_wall(transform_dict)
+
+    mc.group([left_wall, right_wall], name="Walls")
 
 def create_wall(p_transform_dict):
-    wall = mc.polyCube()
-    mc.xform(wall,
-        translation = [p_transform_dict['tx'], p_transform_dict['ty'], p_transform_dict['tz']],
-        rotation = [p_transform_dict['rx'], p_transform_dict['ry'], p_transform_dict['rz']],
-        scale = [p_transform_dict['sx'], p_transform_dict['sy'], p_transform_dict['sz']],
-        worldSpace=True)
+    wall = mc.polyCube(width = p_transform_dict['sx'], height = p_transform_dict['sy'], depth = p_transform_dict['sz'], name = "Wall")[0]
+    mc.move(0, p_transform_dict['sy'] / 2, 0)
 
     frames_list = create_frames_on_wall(p_transform_dict['sx']) # The wall is a square. If changed, pass in width and height separately.
     frames_grp = mc.group(frames_list, name="frames")
-    mc.xform(frames_grp,
-             translation = [(p_transform_dict['tx'] + 0.2), (p_transform_dict['ty'] - 32), (p_transform_dict['tz'] - 0.4)],
-             rotation = [p_transform_dict['rx'], p_transform_dict['ry'], p_transform_dict['rz']],
-             worldSpace=True)
+
+    wall_with_frames = mc.group([wall, frames_grp], name="Wall_With_Frames")
+
+    mc.xform(wall_with_frames,
+        translation = [p_transform_dict['tx'], p_transform_dict['ty'], p_transform_dict['tz']],
+        rotation = [p_transform_dict['rx'], p_transform_dict['ry'], p_transform_dict['rz']],
+        worldSpace=True)
+
+    return wall_with_frames
 
 def create_frames_on_wall(p_wall_dimensions):
     num_frames = 400
