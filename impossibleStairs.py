@@ -18,20 +18,25 @@ def generate_stairs():
     # Polyextrude the front face of the first step
     mc.polyExtrudeFacet(first_step + ".f[0]", ltz=0.4)  # ltz determined after manual testing
 
-    step_height = generate_flight_of_stairs(coord_dict, 0,             -SQ_STEP_SIZE, step_height, 6)
-    step_height = generate_flight_of_stairs(coord_dict, SQ_STEP_SIZE,  0,             step_height, 5)
-    step_height = generate_flight_of_stairs(coord_dict, 0,             SQ_STEP_SIZE,  step_height, 4)
-    step_height = generate_flight_of_stairs(coord_dict, -SQ_STEP_SIZE, 0,             step_height, 2)
+    step_height, first_flight = generate_flight_of_stairs(coord_dict, 0,             -SQ_STEP_SIZE, step_height, 6)
+    step_height, second_flight = generate_flight_of_stairs(coord_dict, SQ_STEP_SIZE,  0,             step_height, 5)
+    step_height, third_flight = generate_flight_of_stairs(coord_dict, 0,             SQ_STEP_SIZE,  step_height, 4)
+    step_height, fourth_flight = generate_flight_of_stairs(coord_dict, -SQ_STEP_SIZE, 0,             step_height, 2)
+
+    mc.group([first_step, first_flight, second_flight, third_flight, fourth_flight], name="Stairs")
 
 def generate_flight_of_stairs(p_coord_dict, p_x_delta, p_z_delta, p_step_height, p_num_steps_in_flight):
     num_steps = 0
+    steps = []
     while num_steps < p_num_steps_in_flight:
         p_coord_dict['x'] += p_x_delta
         p_coord_dict['z'] += p_z_delta
-        p_step_height = create_step(p_step_height, p_coord_dict)[0]
+        p_step_height, step = create_step(p_step_height, p_coord_dict)
+        steps.append(step)
         num_steps += 1
 
-    return p_step_height
+    steps_grp = mc.group(steps, name="Flight_of_Stairs")
+    return (p_step_height, steps_grp)
 
 def create_step(p_step_height, p_coord_dict):
     curr_step = mc.polyCube(d = SQ_STEP_SIZE, h = p_step_height, w = SQ_STEP_SIZE)[0]
