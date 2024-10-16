@@ -40,7 +40,7 @@ def create_cube(p_cube_height, p_coord_dict):
     mc.select(curr_cube)
     
     # Move pivot to the bottom of the cube (Y = -p_cube_height / 2)
-    mc.xform(curr_cube, pivots=(0, -p_cube_height / 2, 0), ws=True)
+    mc.xform(curr_cube, pivots=(0, (-p_cube_height / 2), 0), ws=True)
     
     # Move the cube so its base aligns with Y = 0 and position it along the X-axis
     mc.move(p_coord_dict['x'], (p_cube_height / 2), p_coord_dict['z'], curr_cube, ws=True)  # y = (p_cube_height / 2) keeps the base at Y=0
@@ -82,6 +82,7 @@ def set_perspective_camera():
 
 # TODO: move into separate file
 def create_walls():
+    wall_dimensions = 67
     # left wall
     transform_dict = {'tx': -10.571,
                       'ty': 0,
@@ -89,8 +90,8 @@ def create_walls():
                       'rx': 0,
                       'ry': 0,
                       'rz': 0,
-                      'sx': 67,
-                      'sy': 67,
+                      'sx': wall_dimensions,
+                      'sy': wall_dimensions,
                       'sz': 0.2}
     create_wall(transform_dict)
 
@@ -108,15 +109,14 @@ def create_wall(p_transform_dict):
         scale = [p_transform_dict['sx'], p_transform_dict['sy'], p_transform_dict['sz']],
         worldSpace=True)
 
-    frames_list = create_frames_on_wall()
+    frames_list = create_frames_on_wall(p_transform_dict['sx']) # The wall is a square. If changed, pass in width and height separately.
     frames_grp = mc.group(frames_list, name="frames")
     mc.xform(frames_grp,
-             translation = [p_transform_dict['tx']+0.1, p_transform_dict['ty']-32, p_transform_dict['tz']-0.4],
+             translation = [(p_transform_dict['tx'] + 0.2), (p_transform_dict['ty'] - 32), (p_transform_dict['tz'] - 0.4)],
              rotation = [p_transform_dict['rx'], p_transform_dict['ry'], p_transform_dict['rz']],
              worldSpace=True)
-    # TODO: Ensure that frames are on the right side of each wall
 
-def create_frames_on_wall():
+def create_frames_on_wall(p_wall_dimensions):
     num_frames = 400
     frame_data_list = []
     frame_list = []
@@ -127,7 +127,9 @@ def create_frames_on_wall():
             frame, fr_width, fr_height = create_rectangular_frame(p_width = random.uniform(2, 4), p_height = random.uniform(1, 3))
 
         # If placement fails, delete the frame
-        if not is_frame_placed_on_wall(fr_width, fr_height, frame_data_list, 67, 67): # TODO: Get wall dimensions dynamically
+        wall_dimensions = (p_wall_dimensions - 3) # padding around the boundaries of the wall
+        # TODO: ensure frames are not touching the floor
+        if not is_frame_placed_on_wall(fr_width, fr_height, frame_data_list, wall_dimensions, wall_dimensions):
             mc.delete(frame)
         else:
             frame_list.append(frame)
@@ -143,8 +145,8 @@ def is_frame_placed_on_wall(p_fr_width, p_fr_height, p_frame_data_list, p_wall_w
     max_attempts = 100
     for _ in range(max_attempts):
         # Randomly choose a position for the frame
-        x_pos = random.uniform(-p_wall_width / 2 + p_fr_width / 2, p_wall_width / 2 - p_fr_width / 2)
-        y_pos = random.uniform(p_fr_height / 2, p_wall_height - p_fr_height / 2)
+        x_pos = random.uniform(((-p_wall_width / 2) + (p_fr_width / 2)), ((p_wall_width / 2) - (p_fr_width / 2)))
+        y_pos = random.uniform((p_fr_height / 2), (p_wall_height - (p_fr_height / 2)))
 
         # Check if the frame overlaps with any existing frames
         if not is_overlap(x_pos, y_pos, p_fr_width, p_fr_height, p_frame_data_list):
