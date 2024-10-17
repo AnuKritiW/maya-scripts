@@ -1,5 +1,6 @@
 import maya.cmds as cmds
 import random
+import math
 
 SQ_WALL_SIZE = 67
 
@@ -100,3 +101,99 @@ def create_walls():
 def create_floor():
     floor = cmds.polyCube(d = 90, h = 0.2, w = 90)[0]
     cmds.xform(floor, t = [0, -32, 0])
+
+
+"""
+Below, we create an arch that has two straight sides and a semi-circular top.
+To create the semi-circular arch at the top, we can first create a curve, and then extrude it.
+
+To create the curve, we can use the parametric eqns of a circle:
+x = r cos(\Theta)
+y = r sin(\Theta)
+
+r is the radius of the circle. 2r will be the width of the arch base from left to right, and also the height of the arch from the base to the tip.
+
+\Theta is in radians, and will span from 0 to pi rad (or 0 to 180 degrees)
+
+To draw the curve, in addition to the width and the height of the curve, we will also need the number of vertices we intend to use to shape the curve.
+The more the vertices, the smoother the curve.
+"""
+
+def create_arch(p_width, p_straight_height, p_vertices=20):
+    """
+    Creates a NURBS curve with straight sides and a semicircular top.
+
+    Parameters:
+    - p_width: Total width of the arch.
+    - p_straight_height: Height of the straight vertical sections.
+    - p_vertices: Number of vertices that form the semicircular part.
+    """
+    points = []
+
+    radius = p_width / 2
+
+    # 1: Add points for the left straight side
+    # Bottom left corner (base of the left side)
+    first_pt = (-radius, 0, 0)
+    points.append(first_pt)
+    # Top left corner (end of the straight section on the left side)
+    points.append((-radius, p_straight_height, 0))
+
+    # 2: Generate points for the semicircular top
+
+    # Every vertex is angle_step away from the previous one
+    angle_step = 180 / (p_vertices - 1)
+
+    for i in range(p_vertices):
+        angle_deg = 180 - (i * angle_step)  # Start from 180° and go to 0°
+        angle_rad = math.radians(angle_deg)
+
+        # Calculate points on the semicircle (centered at y = p_straight_height)
+        x = radius * math.cos(angle_rad)
+        y = (radius * math.sin(angle_rad)) + p_straight_height
+
+        # Append each calculated point for the semicircular part
+        points.append((x, y, 0))
+
+    # 3. Add points for the right straight side
+    # Top right corner (end of the straight section on the right side)
+    points.append((radius, p_straight_height, 0))
+    # Bottom right corner (base of the right side)
+    last_pt = (radius, 0, 0)
+    points.append(last_pt)
+
+    # Step 4: Create the NURBS curve using the combined points
+    arch_curve = cmds.curve(p = points, degree = 3, name = "Arch_Curve")
+    # cmds.closeCurve(arch_curve, ch=False)
+
+    floor_curve = create_floor_curve(first_pt, last_pt) # TODO: connect floor curve to arch curve and extrude together; consider using .extendCurve ?
+
+    return arch_curve
+
+def create_floor_curve(p_first_pt, p_last_pt):
+    return cmds.curve(p=[p_first_pt, p_last_pt], degree = 1)
+
+def extrude_arch(arch_curve, depth):
+    # Create a straight line for the extrusion path
+    extrude_path = cmds.curve(p = [(0, 0, 0), (0, 0, depth)], degree = 1, name = "Extrude_Path")
+
+    # Extrude the arch along the path
+    extruded_hallway = cmds.extrude(arch_curve, extrude_path, ch = True, rn = False, po = 1, et = 2, ucp = 1, name="Hallway_Arch")
+    return extrude_path, extruded_hallway
+
+def create_hallway_with_arch(p_width, p_height, p_depth):
+    # Create the arch curve
+    arch_curve = create_arch(p_width, p_height)
+
+    # Extrude the arch curve to form the hallway
+    extrude_path, hallway = extrude_arch(arch_curve, p_depth)
+
+    hallway_curves_grp = cmds.group([arch_curve, extrude_path], name = "Hallway_Curves")
+    cmds.hide(hallway_curves_grp)
+
+    hallway_grp = cmds.group([hallway[0], hallway_curves_grp], name = "Hallway")
+
+    # TODO: Move the hallway to final location
+    cmds.move(0, -32, -10, hallway_curves_grp)
+
+    return hallway_grp

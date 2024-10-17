@@ -32,6 +32,7 @@ def main():
     impossibleStairs.generate_stairs()
     camera.set_perspective_camera()
     scene.create_walls()
+    scene.create_hallway_with_arch(p_width=10, p_height=10, p_depth=30)
     scene.create_floor()
 
 main()
