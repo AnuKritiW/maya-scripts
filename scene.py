@@ -96,7 +96,8 @@ def create_walls():
     transform_dict['ry'] = 89.478 # Rotate to help with the illusion
     right_wall = create_wall(transform_dict, "Right_Wall")
 
-    cmds.group([left_wall, right_wall], name = "Walls")
+    walls_grp = cmds.group([left_wall, right_wall], name = "Walls")
+    return walls_grp
 
 def create_floor():
     floor = cmds.polyCube(d = 90, h = 0.2, w = 90)[0]
@@ -159,19 +160,16 @@ def create_arch(p_width, p_straight_height, p_vertices=20):
     # Top right corner (end of the straight section on the right side)
     points.append((radius, p_straight_height, 0))
     # Bottom right corner (base of the right side)
-    last_pt = (radius, 0, 0)
-    points.append(last_pt)
+    points.append((radius, 0, 0))
+
+    points.append(first_pt)
 
     # Step 4: Create the NURBS curve using the combined points
-    arch_curve = cmds.curve(p = points, degree = 3, name = "Arch_Curve")
-    # cmds.closeCurve(arch_curve, ch=False)
+    arch_curve = cmds.curve(p = points, degree = 1, name = "Arch_Curve")
+    closed_curve = cmds.closeCurve(arch_curve, ch=False)[0]
+    print((len(closed_curve)))
 
-    floor_curve = create_floor_curve(first_pt, last_pt) # TODO: connect floor curve to arch curve and extrude together; consider using .extendCurve ?
-
-    return arch_curve
-
-def create_floor_curve(p_first_pt, p_last_pt):
-    return cmds.curve(p=[p_first_pt, p_last_pt], degree = 1)
+    return arch_curve, closed_curve
 
 def extrude_arch(arch_curve, depth):
     # Create a straight line for the extrusion path
@@ -179,21 +177,23 @@ def extrude_arch(arch_curve, depth):
 
     # Extrude the arch along the path
     extruded_hallway = cmds.extrude(arch_curve, extrude_path, ch = True, rn = False, po = 1, et = 2, ucp = 1, name="Hallway_Arch")
+    cmds.delete(extruded_hallway, constructionHistory=True)
     return extrude_path, extruded_hallway
 
 def create_hallway_with_arch(p_width, p_height, p_depth):
     # Create the arch curve
-    arch_curve = create_arch(p_width, p_height)
+    arch_curve, closed_curve = create_arch(p_width, p_height)
 
     # Extrude the arch curve to form the hallway
     extrude_path, hallway = extrude_arch(arch_curve, p_depth)
 
-    hallway_curves_grp = cmds.group([arch_curve, extrude_path], name = "Hallway_Curves")
-    cmds.hide(hallway_curves_grp)
+    # TODO: extrude the curve inwards to give depth
+    # cmds.polyExtrudeFacet(hallway[0] + '.f[0]', ltz = 2)
+
+    hallway_curves_grp = cmds.group([arch_curve, closed_curve, extrude_path], name = "Hallway_Curves")
+    cmds.hide(hallway_curves_grp) # Clean up the scene
 
     hallway_grp = cmds.group([hallway[0], hallway_curves_grp], name = "Hallway")
-
-    # TODO: Move the hallway to final location
-    cmds.move(0, -32, -10, hallway_curves_grp)
+    cmds.move(-7, 0, 30, hallway_grp)
 
     return hallway_grp
