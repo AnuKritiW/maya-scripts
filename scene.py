@@ -95,8 +95,12 @@ def create_walls():
     transform_dict['ry'] = 89.478 # Rotate to help with the illusion
     right_wall = create_wall(transform_dict, "Right_Wall")
 
-    cmds.group([left_wall, right_wall], name = "Walls")
+    # TODO: optimize this bit by getting the transformations right the first time
+    walls_grp = cmds.group([left_wall, right_wall], name = "Walls")
+    cmds.xform(walls_grp,
+               t = (11.637219585894766, 0, -32.82290721133882),
+               ro = (0.0, -131.41189034927982, 0.0))
 
 def create_floor():
-    floor = cmds.polyCube(d = 90, h = 0.2, w = 90)[0]
-    cmds.xform(floor, t = [0, -32, 0])
+    floor = cmds.polyCube(d = 120, h = 0.2, w = 120)[0]
+    cmds.xform(floor, t = [0, -33, 0], ro = [0, 48, 0])
