@@ -38,6 +38,10 @@ def get_top_centre(p_step_name):
 
     return top_center
 
+"""
+The ball will definitely hit all of the (x, z) locations of each step.
+y will be the only thing that needs adjustment on each step.
+"""
 def animate_ball(ball, fixed_pts, fps=25, duration=10):
     total_frames = fps * duration
     num_points = len(fixed_pts)
@@ -51,15 +55,19 @@ def animate_ball(ball, fixed_pts, fps=25, duration=10):
         cmds.setKeyframe(ball, t=frame_number)  # Set a keyframe at the frame number
 
 def create_ball():
-    fixed_pts = [value[-1][1] for value in get_stairs_info().values()]
-    fixed_pts.append(fixed_pts[0])
+    # turning_pts = [value[-1][1] for value in get_stairs_info().values()]
+    # turning_pts.append(turning_pts[0])
 
-    fixed_pts.reverse() # So the ball is descending instead of ascending
+    # turning_pts.reverse() # So the ball is descending instead of ascending
+
+    all_coords = [coord for value in get_stairs_info().values() for _, coord in value]
+    all_coords.append(all_coords[0])
+    all_coords.reverse()
 
     ball = cmds.polySphere(radius=BALL_RADIUS)[0]
-    cmds.xform(ball, t=fixed_pts[0])
+    cmds.xform(ball, t=all_coords[0])
 
-    animate_ball(ball, fixed_pts)
+    animate_ball(ball, all_coords)
 
 create_ball()
 get_stairs_info()
