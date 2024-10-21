@@ -21,7 +21,7 @@ def main():
     clear_scene()
 
     # List of scripts to load
-    scripts_to_import = ['impossibleStairs.py', 'scene.py', 'camera.py'] # , 'ball.py']
+    scripts_to_import = ['impossibleStairs.py', 'scene.py', 'camera.py' , 'ball.py']
 
     for script in scripts_to_import:
         script_path = os.path.join(script_dir, script)
@@ -33,6 +33,6 @@ def main():
     camera.set_perspective_camera()
     scene.create_walls()
     scene.create_floor()
-    # ball.create_ball()
+    ball.create_and_animate_ball()
 
 main()
