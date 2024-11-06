@@ -6,6 +6,16 @@ The inspiration for this scene is the grand staircase from Harry Potter.
   <img src="./ref-images/scene/stairs-ref-1.jpg" width="400" />
 </p>
 
+## Ball
+
+The Quaffle (used in Harry Potter's Quidditch) is made of leather
+
+<p>
+  <img src="./ref-images/ball/quaffle-1.png" width="400">
+  <img src="./ref-images/ball/quaffle-2.jpg" width="500">
+</p>
+
+
 ## Frames
 
 The plan is to enclose the impossible staircase in an enclosed room, with frames of various sizes on the walls. 
