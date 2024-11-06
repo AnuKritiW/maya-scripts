@@ -62,7 +62,7 @@ Parameters:
     bounce_factor (float): A scaling factor that affects the width and steepness of the parabolic bounce curve. Larger values result in a steeper bounce,
                            while smaller values create a flatter, more gradual bounce.
 """
-def animate_ball(p_ball, p_step_top_coords, fps=25, duration=10, bounce_height=5, bounce_factor=4):
+def animate_ball(p_ball, p_step_top_coords, fps=25, duration=10, bounce_height=5, bounce_factor=4, squash_factor=0.2):
     total_frames = fps * duration
     num_points = len(p_step_top_coords)
 
@@ -70,7 +70,12 @@ def animate_ball(p_ball, p_step_top_coords, fps=25, duration=10, bounce_height=5
 
     # Set the exact position at the first step
     cmds.xform(p_ball, t=p_step_top_coords[0])
-    cmds.setKeyframe(p_ball, t=0)
+    cmds.setKeyframe(p_ball, t=0, attribute='translate')
+
+    # Initial ball size keyframes
+    cmds.setKeyframe(p_ball, t=0, attribute='scaleX', value=1)
+    cmds.setKeyframe(p_ball, t=0, attribute='scaleY', value=1)
+    cmds.setKeyframe(p_ball, t=0, attribute='scaleZ', value=1)
 
     # Interpolate between points for the bounces
     for i in range(num_points - 1):
@@ -101,13 +106,33 @@ def animate_ball(p_ball, p_step_top_coords, fps=25, duration=10, bounce_height=5
             """
             y = (y_base + max(0, bounce))
 
+            # Squash and stretch based on position
+            if bounce > 0:  # Ball is in mid-air, apply stretch
+                scale_xz = 1 - (squash_factor * (bounce / bounce_height))
+                scale_y = 1 + (squash_factor * (bounce / bounce_height))
+            else:  # Ball is at or near ground, apply squash
+                scale_xz = 1 + squash_factor
+                scale_y = 1 - squash_factor
+
             # Apply the translation
             cmds.xform(p_ball, t=(x, y, z))
-            cmds.setKeyframe(p_ball, t=frame)
+            cmds.setKeyframe(p_ball, t=frame, attribute='translate')
+
+            # Set squash/stretch keyframes
+            cmds.setKeyframe(p_ball, t=frame, attribute='scaleX', value=scale_xz)
+            cmds.setKeyframe(p_ball, t=frame, attribute='scaleY', value=scale_y)
+            cmds.setKeyframe(p_ball, t=frame, attribute='scaleZ', value=scale_xz)
 
     # Set the exact position at the last step
     cmds.xform(p_ball, t=p_step_top_coords[-1])
-    cmds.setKeyframe(p_ball, t=total_frames)
+    cmds.setKeyframe(p_ball, t=total_frames, attribute='translate')
+
+    # Final scale keyframes to reset to original size at end
+    cmds.setKeyframe(p_ball, t=total_frames, attribute='scaleX', value=1)
+    cmds.setKeyframe(p_ball, t=total_frames, attribute='scaleY', value=1)
+    cmds.setKeyframe(p_ball, t=total_frames, attribute='scaleZ', value=1)
+
+
 
 def create_and_animate_ball():
     step_top_coords = [coord for value in get_stairs_info().values() for _, coord in value]
