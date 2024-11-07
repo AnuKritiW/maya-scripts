@@ -4,6 +4,7 @@ import os
 
 # Manually specify the directory where your scripts are located
 script_dir = r'C:\Users\anukr\Desktop\Code\maya-scripts'  # Use raw string for Windows path
+# script_dir = r'/home/s5647918/Code/maya-scripts'
 # TODO: get path dynamically; change path to match machine until then
 
 # Function to dynamically import a module from a file
@@ -21,7 +22,7 @@ def main():
     clear_scene()
 
     # List of scripts to load
-    scripts_to_import = ['impossibleStairs.py', 'scene.py', 'camera.py' , 'ball.py']
+    scripts_to_import = ['impossibleStairs.py', 'scene.py', 'camera.py' , 'ball.py', 'textures.py']
 
     for script in scripts_to_import:
         script_path = os.path.join(script_dir, script)
@@ -31,7 +32,8 @@ def main():
     # Populate scene
     impossibleStairs.generate_stairs()
     camera.set_perspective_camera()
-    scene.create_walls()
+    materials = textures.create_textures()
+    scene.create_walls(materials)
     scene.create_floor()
     ball.create_and_animate_ball()
 
