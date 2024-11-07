@@ -11,6 +11,9 @@
 
 # Ignore Maya render output files
 images/
+*.swatch
+*Swatches/
+.mayaswatches/
 
 # Ignore temporary files and directories
 temp/
