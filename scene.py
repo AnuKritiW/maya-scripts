@@ -60,9 +60,9 @@ def create_frames_on_wall(portraits):
             cmds.hyperShade(assign=random.choice(portraits))
 
             cmds.select(frame + '.f[0]')  # Select the front face
-            cmds.polyAutoProjection(frame + '.f[0]', lm=0, ibd=True)
+            cmds.polyAutoProjection(frame + '.f[0]', lm=0, ibd=True, sc=2)
 
-            cmds.polyEditUV(frame + '.f[0]', r=True, angle=90)  # Rotate the UVs by 180 degrees
+            # cmds.polyEditUV(frame + '.f[0]', r=True, angle=90)  # Rotate the UVs by 180 degrees
 
             frame_list.append(frame)
 
