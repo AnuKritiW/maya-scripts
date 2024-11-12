@@ -3,8 +3,8 @@ import importlib.util
 import os
 
 # Manually specify the directory where your scripts are located
-script_dir = r'C:\Users\anukr\Desktop\Code\maya-scripts'  # Use raw string for Windows path
-# script_dir = r'/home/s5647918/Code/maya-scripts'
+# script_dir = r'C:\Users\anukr\Desktop\Code\maya-scripts'  # Use raw string for Windows path
+script_dir = r'/home/s5647918/Code/maya-scripts'
 # TODO: get path dynamically; change path to match machine until then
 
 # Function to dynamically import a module from a file
@@ -35,6 +35,8 @@ def main():
     materials = textures.create_textures()
     scene.create_walls(materials)
     scene.create_floor()
-    ball.create_and_animate_ball()
+    animated_ball = ball.create_and_animate_ball()
+    leather = textures.create_leather_material()
+    textures.assign_material_to_object(leather, animated_ball) #TODO: cleanup logic
 
 main()

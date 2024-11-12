@@ -62,3 +62,32 @@ def create_material(p_portrait, p_offset_level):
         cmds.expression(s=expression, o="", ae=True, uc="all")
 
         return material
+
+def create_leather_material(material_name='leatherMaterial', shading_group_name='leatherSG'):
+    # Create a Blinn material (or use another type if preferred)
+    material = cmds.shadingNode('blinn', asShader=True, name=material_name)
+
+    # Create a shading group and connect the material
+    shading_group = cmds.sets(renderable=True, noSurfaceShader=True, empty=True, name=shading_group_name)
+    cmds.connectAttr(f'{material}.outColor', f'{shading_group}.surfaceShader', force=True)
+
+    # Create a leather texture node
+    leather_texture = cmds.shadingNode('leather', asTexture=True, name='leatherTexture')
+
+    # Create a place3dTexture node and connect it to the leather texture
+    place_3d_texture = cmds.shadingNode('place3dTexture', asUtility=True, name='place3dTexture1')
+    cmds.connectAttr(f'{place_3d_texture}.worldMatrix[0]', f'{leather_texture}.placementMatrix', force=True)
+
+    # Connect the leather texture to the color attribute of the material
+    cmds.connectAttr(f'{leather_texture}.outColor', f'{material}.color', force=True)
+
+    # Adjust the leather texture's attributes (e.g., color, scale)
+    cmds.setAttr(f'{leather_texture}.creaseColor', 0.174, 0.087, 0.0, type='double3')
+    cmds.setAttr(f'{leather_texture}.cellColor', 0.110, 0.046, 0.017, type='double3')
+    cmds.setAttr(f'{leather_texture}.cellSize', 0.2)  # Adjust the cell size
+
+    return material
+
+def assign_material_to_object(material, object):
+    cmds.select(object)
+    cmds.hyperShade(assign=material)
