@@ -88,6 +88,37 @@ def create_leather_material(material_name='leatherMaterial', shading_group_name=
 
     return material
 
+import maya.cmds as cmds
+
+def create_brick_material(material_name="brickMaterial", repeatU=16, repeatV=24):
+        texture_file_path = '/home/s5647918/Downloads/brick-wall-texture.jpg'
+        # Create a Lambert material
+        material = cmds.shadingNode('lambert', asShader=True, name=material_name)
+
+        # Create a file texture node and set its file path
+        file_node = cmds.shadingNode('file', asTexture=True, name='brickFileTexture')
+        cmds.setAttr(f'{file_node}.fileTextureName', texture_file_path, type='string')
+
+        # Create a 2D texture placement node and connect it to the file node
+        place2d_node = cmds.shadingNode('place2dTexture', asUtility=True, name='place2dBrick')
+        cmds.connectAttr(f'{place2d_node}.outUV', f'{file_node}.uvCoord')
+        cmds.connectAttr(f'{place2d_node}.outUvFilterSize', f'{file_node}.uvFilterSize')
+
+        # Set repeat UV values to tile the texture
+        cmds.setAttr(f'{place2d_node}.repeatU', repeatU)
+        cmds.setAttr(f'{place2d_node}.repeatV', repeatV)
+
+        # Connect the file texture's output to the color attribute of the material
+        cmds.connectAttr(f'{file_node}.outColor', f'{material}.color')
+
+        # Create a shading group and assign the material to it
+        shading_group = cmds.sets(renderable=True, noSurfaceShader=True, empty=True, name=f'{material_name}SG')
+        cmds.connectAttr(f'{material}.outColor', f'{shading_group}.surfaceShader', force=True)
+
+        print(f"Material '{material_name}' with tiled brick texture has been created.")
+        return material
+
+
 def assign_material_to_object(material, object):
     cmds.select(object)
     cmds.hyperShade(assign=material)

@@ -72,9 +72,12 @@ def create_frames_on_wall(portraits):
 
     return frame_list
 
-def create_wall(p_transform_dict, p_wall_name, portraits):
+def create_wall(p_transform_dict, p_wall_name, portraits, bricks):
     wall = cmds.polyCube(w = p_transform_dict['sx'], h = p_transform_dict['sy'], d = p_transform_dict['sz'], name = p_wall_name)[0]
     cmds.move(0, p_transform_dict['sy'] / 2, 0)
+
+    cmds.select(wall)
+    cmds.hyperShade(assign=bricks)
 
     frames_list = create_frames_on_wall(portraits)
     frames_grp = cmds.group(frames_list, name = "Frames")
@@ -88,7 +91,7 @@ def create_wall(p_transform_dict, p_wall_name, portraits):
 
     return wall_with_frames
 
-def create_walls(portraits):
+def create_walls(portraits, bricks):
     # left wall
     transform_dict = {'tx': -10.571,
                       'ty': -33,
@@ -99,13 +102,13 @@ def create_walls(portraits):
                       'sx': SQ_WALL_SIZE,
                       'sy': SQ_WALL_SIZE,
                       'sz': 0.2}
-    left_wall = create_wall(transform_dict, "Left_Wall", portraits)
+    left_wall = create_wall(transform_dict, "Left_Wall", portraits, bricks)
 
     # right wall
     transform_dict['tx'] = -42.995
     transform_dict['tz'] = 8.603
     transform_dict['ry'] = 89.478 # Rotate to help with the illusion
-    right_wall = create_wall(transform_dict, "Right_Wall", portraits)
+    right_wall = create_wall(transform_dict, "Right_Wall", portraits, bricks)
 
     # TODO: optimize this bit by getting the transformations right the first time
     walls_grp = cmds.group([left_wall, right_wall], name = "Walls")
