@@ -30,12 +30,17 @@ def main():
         globals()[module_name] = import_module(module_name, script_path)
 
     # Populate scene
-    impossibleStairs.generate_stairs()
+    mahogany = textures.create_mahogany_wood_material()
+    stairs_grp = impossibleStairs.generate_stairs()
+    textures.assign_material_to_object(mahogany, stairs_grp)
+
     camera.set_perspective_camera()
+
     materials = textures.create_textures()
     bricks = textures.create_brick_material()
     scene.create_walls(materials, bricks)
     scene.create_floor()
+
     animated_ball = ball.create_and_animate_ball()
     leather = textures.create_leather_material()
     textures.assign_material_to_object(leather, animated_ball) #TODO: cleanup logic

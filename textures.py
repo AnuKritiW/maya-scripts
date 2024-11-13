@@ -63,35 +63,38 @@ def create_material(p_portrait, p_offset_level):
 
         return material
 
-def create_leather_material(material_name='leatherMaterial', shading_group_name='leatherSG'):
-    # Create a Blinn material (or use another type if preferred)
-    material = cmds.shadingNode('blinn', asShader=True, name=material_name)
+def create_leather_material():
+        material_name='leatherMaterial'
+        shading_group_name='leatherSG'
+        # Create a Blinn material (or use another type if preferred)
+        material = cmds.shadingNode('blinn', asShader=True, name=material_name)
 
-    # Create a shading group and connect the material
-    shading_group = cmds.sets(renderable=True, noSurfaceShader=True, empty=True, name=shading_group_name)
-    cmds.connectAttr(f'{material}.outColor', f'{shading_group}.surfaceShader', force=True)
+        # Create a shading group and connect the material
+        shading_group = cmds.sets(renderable=True, noSurfaceShader=True, empty=True, name=shading_group_name)
+        cmds.connectAttr(f'{material}.outColor', f'{shading_group}.surfaceShader', force=True)
 
-    # Create a leather texture node
-    leather_texture = cmds.shadingNode('leather', asTexture=True, name='leatherTexture')
+        # Create a leather texture node
+        leather_texture = cmds.shadingNode('leather', asTexture=True, name='leatherTexture')
 
-    # Create a place3dTexture node and connect it to the leather texture
-    place_3d_texture = cmds.shadingNode('place3dTexture', asUtility=True, name='place3dTexture1')
-    cmds.connectAttr(f'{place_3d_texture}.worldMatrix[0]', f'{leather_texture}.placementMatrix', force=True)
+        # Create a place3dTexture node and connect it to the leather texture
+        place_3d_texture = cmds.shadingNode('place3dTexture', asUtility=True, name='place3dTexture1')
+        cmds.connectAttr(f'{place_3d_texture}.worldMatrix[0]', f'{leather_texture}.placementMatrix', force=True)
 
-    # Connect the leather texture to the color attribute of the material
-    cmds.connectAttr(f'{leather_texture}.outColor', f'{material}.color', force=True)
+        # Connect the leather texture to the color attribute of the material
+        cmds.connectAttr(f'{leather_texture}.outColor', f'{material}.color', force=True)
 
-    # Adjust the leather texture's attributes (e.g., color, scale)
-    cmds.setAttr(f'{leather_texture}.creaseColor', 0.174, 0.087, 0.0, type='double3')
-    cmds.setAttr(f'{leather_texture}.cellColor', 0.110, 0.046, 0.017, type='double3')
-    cmds.setAttr(f'{leather_texture}.cellSize', 0.2)  # Adjust the cell size
+        # Adjust the leather texture's attributes (e.g., color, scale)
+        cmds.setAttr(f'{leather_texture}.creaseColor', 0.174, 0.087, 0.0, type='double3')
+        cmds.setAttr(f'{leather_texture}.cellColor', 0.110, 0.046, 0.017, type='double3')
+        cmds.setAttr(f'{leather_texture}.cellSize', 0.2)  # Adjust the cell size
 
-    return material
+        return material
 
-import maya.cmds as cmds
+def create_brick_material(repeatU=16, repeatV=24):
+        material_name="brickMaterial"
+        texture_file_path = f'./brick-wall-texture.jpg'
+        # texture_file_path = f'C:/Users/anukr/Desktop/Code/maya-scripts/brick-wall-texture.jpg'
 
-def create_brick_material(material_name="brickMaterial", repeatU=16, repeatV=24):
-        texture_file_path = '/home/s5647918/Downloads/brick-wall-texture.jpg'
         # Create a Lambert material
         material = cmds.shadingNode('lambert', asShader=True, name=material_name)
 
@@ -118,6 +121,33 @@ def create_brick_material(material_name="brickMaterial", repeatU=16, repeatV=24)
         print(f"Material '{material_name}' with tiled brick texture has been created.")
         return material
 
+def create_mahogany_wood_material():
+        material_name='mahoganyMaterial'
+        shading_group_name='mahoganySG'
+
+        # Create a Lambert material for a non-reflective look
+        material = cmds.shadingNode('lambert', asShader=True, name=material_name)
+
+        # Create a shading group and connect the material to it
+        shading_group = cmds.sets(renderable=True, noSurfaceShader=True, empty=True, name=shading_group_name)
+        cmds.connectAttr(f'{material}.outColor', f'{shading_group}.surfaceShader', force=True)
+
+        # Create a wood texture node
+        wood_texture = cmds.shadingNode('wood', asTexture=True, name='mahoganyWoodTexture')
+
+        # Create a place3dTexture node for the wood texture and connect it
+        place_3d_texture = cmds.shadingNode('place3dTexture', asUtility=True, name='place3dTexture1')
+        cmds.connectAttr(f'{place_3d_texture}.worldMatrix[0]', f'{wood_texture}.placementMatrix', force=True)
+
+        # Connect the wood texture to the color attribute of the material
+        cmds.connectAttr(f'{wood_texture}.outColor', f'{material}.color', force=True)
+
+        # Adjust the wood texture's properties for a deep mahogany appearance
+        cmds.setAttr(f'{wood_texture}.fillerColor', 0.07, 0.053, 0.04, type='double3')
+        # cmds.setAttr(f'{wood_texture}.veinColor', 0.157, 0.078, 0.039, type='double3')
+        # cmds.setAttr(f'{wood_texture}.grainColor', 0.118, 0.039, 0.00, type='double3')
+
+        return material
 
 def assign_material_to_object(material, object):
     cmds.select(object)
