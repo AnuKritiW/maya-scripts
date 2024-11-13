@@ -22,7 +22,7 @@ def main():
     clear_scene()
 
     # List of scripts to load
-    scripts_to_import = ['impossibleStairs.py', 'scene.py', 'camera.py' , 'ball.py', 'textures.py']
+    scripts_to_import = ['impossibleStairs.py', 'scene.py', 'camera.py' , 'ball.py', 'textures.py', 'lights.py']
 
     for script in scripts_to_import:
         script_path = os.path.join(script_dir, script)
@@ -44,5 +44,7 @@ def main():
     animated_ball = ball.create_and_animate_ball()
     leather = textures.create_leather_material()
     textures.assign_material_to_object(leather, animated_ball) #TODO: cleanup logic
+
+    lights.create_area_light()
 
 main()
