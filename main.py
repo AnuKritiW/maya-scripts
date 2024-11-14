@@ -30,20 +30,26 @@ def main():
         globals()[module_name] = import_module(module_name, script_path)
 
     # Populate scene
-    mahogany = textures.create_mahogany_wood_material()
+    marble_mat = textures.import_material('marble')
     stairs_grp = impossibleStairs.generate_stairs()
-    textures.assign_material_to_object(mahogany, stairs_grp)
+    if marble_mat:
+        textures.assign_material_to_object(marble_mat, stairs_grp)
 
     camera.set_perspective_camera()
 
     materials = textures.create_textures()
     bricks = textures.create_brick_material()
     scene.create_walls(materials, bricks)
-    scene.create_floor()
 
+    black_tile_mat = textures.import_material('black_tile')
+    floor = scene.create_floor()
+    if black_tile_mat:
+        textures.assign_material_to_object(black_tile_mat, floor)
+
+    leather_mat = textures.import_material('leather')
     animated_ball = ball.create_and_animate_ball()
-    leather = textures.create_leather_material()
-    textures.assign_material_to_object(leather, animated_ball) #TODO: cleanup logic
+    if leather_mat:
+        textures.assign_material_to_object(leather_mat, animated_ball)
 
     lights.create_area_light()
 
