@@ -3,7 +3,8 @@ import importlib.util
 import os
 
 # Manually specify the directory where your scripts are located
-script_dir = r'C:\Users\anukr\Desktop\Code\maya-scripts'  # Use raw string for Windows path
+# script_dir = r'C:\Users\anukr\Desktop\Code\maya-scripts'  # Use raw string for Windows path
+script_dir = r'/home/s5647918/Code/maya-scripts'
 # TODO: get path dynamically; change path to match machine until then
 
 # Function to dynamically import a module from a file
@@ -21,7 +22,7 @@ def main():
     clear_scene()
 
     # List of scripts to load
-    scripts_to_import = ['impossibleStairs.py', 'scene.py', 'camera.py' , 'ball.py']
+    scripts_to_import = ['impossibleStairs.py', 'scene.py', 'camera.py' , 'ball.py', 'textures.py', 'lights.py']
 
     for script in scripts_to_import:
         script_path = os.path.join(script_dir, script)
@@ -29,10 +30,27 @@ def main():
         globals()[module_name] = import_module(module_name, script_path)
 
     # Populate scene
-    impossibleStairs.generate_stairs()
+    marble_mat = textures.import_material('marble')
+    stairs_grp = impossibleStairs.generate_stairs()
+    if marble_mat:
+        textures.assign_material_to_object(marble_mat, stairs_grp)
+
     camera.set_perspective_camera()
-    scene.create_walls()
-    scene.create_floor()
-    ball.create_and_animate_ball()
+
+    materials = textures.create_textures()
+    bricks = textures.create_brick_material()
+    scene.create_walls(materials, bricks)
+
+    black_tile_mat = textures.import_material('black_tile')
+    floor = scene.create_floor()
+    if black_tile_mat:
+        textures.assign_material_to_object(black_tile_mat, floor)
+
+    leather_mat = textures.import_material('leather')
+    animated_ball = ball.create_and_animate_ball()
+    if leather_mat:
+        textures.assign_material_to_object(leather_mat, animated_ball)
+
+    lights.create_area_light()
 
 main()

@@ -39,7 +39,7 @@ def create_rectangular_frame(p_width, p_height):
     frame = cmds.polyCube(w = p_width, h = p_height, d = 0.2, name = "Rectangular_Frame")[0]
     return (frame, p_width, p_height)
 
-def create_frames_on_wall():
+def create_frames_on_wall(portraits):
     num_frames = 400
     frame_data_list = []
     frame_list = []
@@ -47,7 +47,7 @@ def create_frames_on_wall():
         frame_type = 'rectangular' # TODO: Add more shapes
 
         if frame_type == 'rectangular':
-            frame, fr_width, fr_height = create_rectangular_frame(p_width = random.uniform(2, 4), p_height = random.uniform(1, 3))
+            frame, fr_width, fr_height = create_rectangular_frame(p_width = random.uniform(4, 8), p_height = random.uniform(3, 9))
 
         # If placement fails, delete the frame
         sq_wall_size = (SQ_WALL_SIZE - 3) # padding around the boundaries of the wall
@@ -56,15 +56,30 @@ def create_frames_on_wall():
         if not is_frame_placed_on_wall(fr_width, fr_height, frame_data_list, sq_wall_size, sq_wall_size):
             cmds.delete(frame)
         else:
+            cmds.select(frame + '.f[0]')  # Select the front face
+            cmds.hyperShade(assign=random.choice(portraits))
+
+            cmds.select(frame + '.f[0]')  # Select the front face
+
+            cmds.polyAutoProjection(frame + '.f[0]', lm=0, ibd=True, sc=2)
+
+            # If the portrait is landscape, polyAutoProjection would have rotated the texture for optimal fit
+            # so we need to rotate the UVs back to the original orientation
+            if fr_width > fr_height:
+                cmds.polyEditUV(frame + '.f[0]', r=True, angle=90)  # Rotate the UVs by 90 degrees
+
             frame_list.append(frame)
 
     return frame_list
 
-def create_wall(p_transform_dict, p_wall_name):
+def create_wall(p_transform_dict, p_wall_name, portraits, bricks):
     wall = cmds.polyCube(w = p_transform_dict['sx'], h = p_transform_dict['sy'], d = p_transform_dict['sz'], name = p_wall_name)[0]
     cmds.move(0, p_transform_dict['sy'] / 2, 0)
 
-    frames_list = create_frames_on_wall()
+    cmds.select(wall)
+    cmds.hyperShade(assign=bricks)
+
+    frames_list = create_frames_on_wall(portraits)
     frames_grp = cmds.group(frames_list, name = "Frames")
 
     wall_with_frames = cmds.group([wall, frames_grp], name = (p_wall_name + "_with_Frames"))
@@ -76,7 +91,7 @@ def create_wall(p_transform_dict, p_wall_name):
 
     return wall_with_frames
 
-def create_walls():
+def create_walls(portraits, bricks):
     # left wall
     transform_dict = {'tx': -10.571,
                       'ty': -33,
@@ -87,13 +102,13 @@ def create_walls():
                       'sx': SQ_WALL_SIZE,
                       'sy': SQ_WALL_SIZE,
                       'sz': 0.2}
-    left_wall = create_wall(transform_dict, "Left_Wall")
+    left_wall = create_wall(transform_dict, "Left_Wall", portraits, bricks)
 
     # right wall
     transform_dict['tx'] = -42.995
     transform_dict['tz'] = 8.603
     transform_dict['ry'] = 89.478 # Rotate to help with the illusion
-    right_wall = create_wall(transform_dict, "Right_Wall")
+    right_wall = create_wall(transform_dict, "Right_Wall", portraits, bricks)
 
     # TODO: optimize this bit by getting the transformations right the first time
     walls_grp = cmds.group([left_wall, right_wall], name = "Walls")
@@ -103,4 +118,6 @@ def create_walls():
 
 def create_floor():
     floor = cmds.polyCube(d = 120, h = 0.2, w = 120)[0]
-    cmds.xform(floor, t = [0, -33, 0], ro = [0, 48, 0])
+    cmds.xform(floor, t = [0, -33, 7], ro = [0, 48, 0])
+
+    return floor

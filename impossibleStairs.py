@@ -52,3 +52,5 @@ def generate_stairs():
 
     # Rotate so we can view the illusion from the front
     cmds.rotate(0, 225, 0, stairs_grp, relative = True)
+
+    return stairs_grp

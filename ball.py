@@ -143,3 +143,5 @@ def create_and_animate_ball():
     cmds.xform(ball, t = step_top_coords[0])
 
     animate_ball(ball, step_top_coords)
+
+    return ball
