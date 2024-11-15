@@ -118,6 +118,6 @@ def create_walls(portraits, bricks):
 
 def create_floor():
     floor = cmds.polyCube(d = 120, h = 0.2, w = 120)[0]
-    cmds.xform(floor, t = [0, -33, 5], ro = [0, 48, 0])
+    cmds.xform(floor, t = [0, -33, 7], ro = [0, 48, 0])
 
     return floor

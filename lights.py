@@ -14,7 +14,7 @@ def create_area_light():
     light_shape = cmds.createNode('aiAreaLight', name= (light_name + 'Shape'), parent=light_transform)
 
     # Apply transformations using xform on the transform node
-    cmds.xform(light_transform, translation=(0, 30.131, -0.788), worldSpace=True)
+    cmds.xform(light_transform, translation=(0, 32.969, -0.788), worldSpace=True)
     cmds.xform(light_transform, rotation=(-90.085, 47.608, -0.063), worldSpace=True)
     cmds.xform(light_transform, scale=(41.011, 41.011, 41.011))
 
